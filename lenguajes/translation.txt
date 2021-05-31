@@ -1,0 +1,2 @@
+public class Main {
+endpublic static entero mayor endend}
