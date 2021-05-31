@@ -1,6 +1,6 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-import java.io.File;
+
 import java.io.FileWriter;
 
 public class Main {
@@ -18,10 +18,10 @@ public class Main {
             MiLenguajeParser parser = new MiLenguajeParser(tokens);
             ParseTree tree = parser.program(); // Iniciar el analisis sintáctico en la regla inicial: r
             //System.out.println(tree.toStringTree(parser)); // imprime el arbol al estilo LISP
-            ParseTreeWalker walker = new ParseTreeWalker();
             FileWriter myWriter = new FileWriter("translation.txt");
 
-            walker.walk(new TranslatorListeners(myWriter),tree);
+            TranslatorVisitor<Object> loader = new TranslatorVisitor<Object>(myWriter);
+            loader.visit(tree);
             System.out.println();
             myWriter.close();
         } catch (Exception e){

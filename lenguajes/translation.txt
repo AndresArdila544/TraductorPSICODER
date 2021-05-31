@@ -1,2 +1,9 @@
 public class Main {
-endpublic static entero mayor endend}
+public static void main(String[] args) {
+int
+}
+public static int mayor(int num1 , int num2 ){
+intreturn ;
+
+}
+}
