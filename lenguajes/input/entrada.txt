@@ -3,8 +3,16 @@
 
 funcion_principal
     entero m,amigo1,amigo2,suma_divisores_amigo1,suma_divisores_amigo2;
+    booleano f;
+    real r;
+    cadena ca;
+    caracter c;
     imprimir("Digite el numero hasta donde desea conocer las parejas de numeros amigos ");
     leer(m);
+    leer(f);
+    leer(r);
+    leer(ca);
+    leer(c);
 
     para (amigo1=2; amigo1<m; 1) hacer
        suma_divisores_amigo1 = amigo(amigo1);

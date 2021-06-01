@@ -527,8 +527,9 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 visitStructurelist(ctx.structurelist());
                 System.out.print("=");
                 myWriter.write("=");
-                System.out.print("System.console().readLine()");
-                myWriter.write("System.console().readLine()");
+                System.out.print("scanner.next()");
+                myWriter.write("scanner.next()");
+
                 //parser
                 System.out.print(";\n");
                 myWriter.write(";\n");
@@ -538,8 +539,15 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 myWriter.write(ctx.ID(0).getText() + " ");
                 System.out.print("=");
                 myWriter.write("=");
-                System.out.print("System.console().readLine()");
-                myWriter.write("System.console().readLine()");
+
+                if(variableTypeInput.containsKey(ctx.ID(0).getText())){
+
+                    System.out.print(variableTypeInput.get(ctx.ID(0).getText()));
+                    myWriter.write(variableTypeInput.get(ctx.ID(0).getText()));
+                }else{
+                    System.out.print("scanner.next()");
+                    myWriter.write("scanner.next()");
+                }
                 //parser
                 System.out.print(";\n");
                 myWriter.write(";\n");
