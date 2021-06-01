@@ -1,22 +1,29 @@
-//Mayor entre 2 numeros - Funciones
-//Llamado a una Función, valor de retorno
+//Numeros Amigos
+//Funciones
 
 funcion_principal
-    entero num1,num2,may;
-    imprimir( "digite un numero entero positivo " );
-    leer( num1 );
-    imprimir( "digite un numero entero positivo " );
-    leer( num2 );
-    may = mayor(num1,num2);
-    imprimir ("El numero mayor es ", may);
+    entero m,amigo1,amigo2,suma_divisores_amigo1,suma_divisores_amigo2;
+    imprimir("Digite el numero hasta donde desea conocer las parejas de numeros amigos ");
+    leer(m);
+
+    para (amigo1=2; amigo1<m; 1) hacer
+       suma_divisores_amigo1 = amigo(amigo1);
+       para(amigo2 = amigo1+1; amigo2<=m; 1) hacer
+           suma_divisores_amigo2 = amigo(amigo2);
+           si((suma_divisores_amigo1 == amigo2) && (suma_divisores_amigo2 == amigo1)) entonces
+              imprimir(amigo1,"  ",amigo2," son amigos");
+           fin_si
+       fin_para
+    fin_para
 fin_principal
 
-funcion entero mayor(entero num1, entero num2) hacer
-    entero res;
-    si ( num1 > num2 ) entonces
-       res = num1;
-    si_no
-       res = num2;
-    fin_si
-    retornar res;
+funcion entero amigo(entero numero) hacer
+  entero divisor, suma_divisores = 0;
+
+  para (divisor=1; divisor<numero; 1) hacer
+      si (numero % divisor == 0) entonces
+         suma_divisores = suma_divisores + divisor;
+      fin_si
+  fin_para
+  retornar suma_divisores;
 fin_funcion

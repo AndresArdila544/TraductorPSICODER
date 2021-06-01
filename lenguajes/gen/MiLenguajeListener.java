@@ -336,14 +336,4 @@ public interface MiLenguajeListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSwinstructionlist(MiLenguajeParser.SwinstructionlistContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiLenguajeParser#dwinstruction}.
-	 * @param ctx the parse tree
-	 */
-	void enterDwinstruction(MiLenguajeParser.DwinstructionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiLenguajeParser#dwinstruction}.
-	 * @param ctx the parse tree
-	 */
-	void exitDwinstruction(MiLenguajeParser.DwinstructionContext ctx);
 }

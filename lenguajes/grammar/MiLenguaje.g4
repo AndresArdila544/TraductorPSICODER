@@ -108,7 +108,8 @@ conditional : SI TK_PAR_IZQ expression TK_PAR_DER ENTONCES ifinstructionlist FIN
 
 whilePSI : MIENTRAS TK_PAR_IZQ expression TK_PAR_DER HACER whinstructionlist FIN_MIENTRAS;
 
-forPSI : PARA TK_PAR_IZQ expression TK_PYC expression TK_PYC expression TK_PAR_DER HACER frinstructionlist FIN_PARA
+forPSI : PARA TK_PAR_IZQ ID TK_ASIG expression declarationlist TK_PYC expression TK_PYC expression TK_PAR_DER HACER frinstructionlist FIN_PARA
+|PARA TK_PAR_IZQ expression TK_PYC expression TK_PYC expression TK_PAR_DER HACER frinstructionlist FIN_PARA
 |PARA TK_PAR_IZQ standardtype ID TK_ASIG expression declarationlist TK_PYC expression TK_PYC expression TK_PAR_DER HACER frinstructionlist FIN_PARA;
 
 dowhile : HACER dwinstructionlist MIENTRAS TK_PAR_IZQ expression TK_PAR_DER TK_PYC;
@@ -141,23 +142,13 @@ whinstructionlist : instruction whinstructionlist
 frinstructionlist : instruction frinstructionlist
 |;
 
-dwinstructionlist : dwinstruction dwinstructionlist
+dwinstructionlist : instruction dwinstructionlist
 | ROMPER TK_PYC
 |;
 
 swinstructionlist : instruction swinstructionlist
 |;
 
-dwinstruction : standardtype ID declarationlist TK_PYC
-|standardtype ID TK_ASIG expression declarationlist TK_PYC
-|LEER TK_PAR_IZQ ID TK_PAR_DER TK_PYC
-|LEER TK_PAR_IZQ ID structurelist TK_PAR_DER TK_PYC
-|conditional
-|whilePSI
-|forPSI
-|dowhile
-|switchPSI
-|IMPRIMIR TK_PAR_IZQ expression expressionlist TK_PAR_DER TK_PYC;
 
 COMMENT         : '/*' .*? '*/' -> skip ;
 LINE_COMMENT     : '//' ~[\r\n]* -> skip ;

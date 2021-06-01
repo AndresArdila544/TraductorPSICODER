@@ -406,18 +406,6 @@ public class MiLenguajeBaseListener implements MiLenguajeListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSwinstructionlist(MiLenguajeParser.SwinstructionlistContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterDwinstruction(MiLenguajeParser.DwinstructionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitDwinstruction(MiLenguajeParser.DwinstructionContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

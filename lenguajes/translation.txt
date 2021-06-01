@@ -1,9 +1,24 @@
 public class Main {
 public static void main(String[] args) {
-int
+int num1 , num2 , may ;
+System.out.println("digite un numero entero positivo ");
+num1 =System.console().readLine();
+System.out.println("digite un numero entero positivo ");
+num2 =System.console().readLine();
+may=mayor(num1,num2);
+System.out.println("El numero mayor es "+""+may);
+
 }
 public static int mayor(int num1 , int num2 ){
-intreturn ;
+int res ;
+if(num1 > num2){
+res=num1;
+
+}else{
+res=num2;
+
+}
+return res;
 
 }
 }

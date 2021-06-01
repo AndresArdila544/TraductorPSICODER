@@ -207,10 +207,4 @@ public interface MiLenguajeVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitSwinstructionlist(MiLenguajeParser.SwinstructionlistContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MiLenguajeParser#dwinstruction}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDwinstruction(MiLenguajeParser.DwinstructionContext ctx);
 }
