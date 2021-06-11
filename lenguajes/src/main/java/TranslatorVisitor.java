@@ -5,24 +5,45 @@ import java.util.HashMap;
 public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     FileWriter myWriter;
     String currentTypeInput;
-    HashMap<String,String> variableTypeInput;
+    HashMap<String, String> variableTypeInput;
+    int tabs;
 
     public TranslatorVisitor(FileWriter myWriter) {
         this.myWriter = myWriter;
         this.currentTypeInput = "scanner.next()";
         this.variableTypeInput = new HashMap<>();
+        this.tabs = 0;
+    }
+
+    public void printTabs() {
+        for (int i = 0; i < tabs; i++) {
+            try {
+                myWriter.write("\t");
+                System.out.print("\t");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public T visitProgram(MiLenguajeParser.ProgramContext ctx) {
         try {
+            System.out.print("import java.util.*;\n");
+            myWriter.write("import java.util.*;\n");
+            System.out.print("\n");
+            myWriter.write("\n");
             System.out.print("public class Main {\n");
             myWriter.write("public class Main {\n");
+            tabs++;
+            printTabs();
             System.out.print("static Scanner scanner = new Scanner(System.in);\n");
             myWriter.write("static Scanner scanner = new Scanner(System.in);\n");
             visitFuncandstruct(ctx.funcandstruct(0));
             visitMainfunction(ctx.mainfunction());
             visitFuncandstruct(ctx.funcandstruct(1));
+            tabs--;
+            printTabs();
             System.out.print("}\n");
             myWriter.write("}\n");
         } catch (IOException e) {
@@ -35,6 +56,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitFuncandstruct(MiLenguajeParser.FuncandstructContext ctx) {
         try {
             if (ctx.FUNCION() != null) {
+                printTabs();
                 System.out.print("public static ");
                 myWriter.write("public static ");
                 visitType(ctx.type());
@@ -45,23 +67,30 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 }
                 System.out.print("){\n");
                 myWriter.write("){\n");
+                tabs++;
                 if (ctx.funccontent() != null) {
                     visitFunccontent(ctx.funccontent());
                 }
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
+                tabs--;
+                printTabs();
+                System.out.print("}\n");
+                myWriter.write("}\n");
                 if (ctx.funcandstruct() != null) {
                     visitFuncandstruct(ctx.funcandstruct());
                 }
 
             } else if (ctx.ESTRUCTURA() != null) {
+                printTabs();
                 System.out.print("static class " + ctx.ID().getText() + "{\n");
                 myWriter.write("static class " + ctx.ID().getText() + "{\n");
+                tabs++;
                 if (ctx.structcontent() != null) {
                     visitStructcontent(ctx.structcontent());
                 }
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
+                tabs--;
+                printTabs();
+                System.out.print("}\n");
+                myWriter.write("}\n");
                 if (ctx.funcandstruct() != null) {
                     visitFuncandstruct(ctx.funcandstruct());
                 }
@@ -105,11 +134,15 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     @Override
     public T visitMainfunction(MiLenguajeParser.MainfunctionContext ctx) {
         try {
+            printTabs();
             System.out.print("public static void main(String[] args) {\n");
             myWriter.write("public static void main(String[] args) {\n");
+            tabs++;
             visitInstructionlist(ctx.instructionlist());
-            System.out.print("\n}\n");
-            myWriter.write("\n}\n");
+            tabs--;
+            printTabs();
+            System.out.print("}\n");
+            myWriter.write("}\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -188,6 +221,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitFunccontent(MiLenguajeParser.FunccontentContext ctx) {
         try {
             visitFninstructionlist(ctx.fninstructionlist());
+            printTabs();
             System.out.print("return ");
             myWriter.write("return ");
             visitExpression(ctx.expression());
@@ -204,6 +238,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitStructcontent(MiLenguajeParser.StructcontentContext ctx) {
         try {
             if (ctx.standardtype() != null) {
+                printTabs();
                 visitStandardtype(ctx.standardtype());
                 System.out.print(" " + ctx.ID(0).getText() + " ");
                 myWriter.write(" " + ctx.ID(0).getText() + " ");
@@ -223,12 +258,14 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 }
 
             } else if (ctx.ID(0) != null) {
-
+                printTabs();
                 System.out.print(ctx.ID(0).getText() + " ");
                 myWriter.write(ctx.ID(0).getText() + " ");
                 System.out.print(ctx.ID(1).getText() + " ");
                 myWriter.write(ctx.ID(1).getText() + " ");
                 if (ctx.declarationlist() != null) {
+                    System.out.println("= new "+ ctx.ID(0).getText()+ " ()");
+                    myWriter.write("= new "+ ctx.ID(0).getText()+ " ()");
                     visitDeclarationlist(ctx.declarationlist());
 
                 } else {
@@ -286,7 +323,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     @Override
     public T visitValue(MiLenguajeParser.ValueContext ctx) {
         try {
-            if (ctx.TK_PAR_IZQ() != null&&ctx.ID()==null) {
+            if (ctx.TK_PAR_IZQ() != null && ctx.ID() == null) {
                 System.out.print("(");
                 myWriter.write("(");
                 visitExpression(ctx.expression());
@@ -429,7 +466,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 myWriter.write(",");
                 System.out.print(" " + ctx.ID().getText() + "=");
                 myWriter.write(" " + ctx.ID().getText() + "=");
-                variableTypeInput.put(ctx.ID().getText(),currentTypeInput);
+                variableTypeInput.put(ctx.ID().getText(), currentTypeInput);
                 visitExpression(ctx.expression());
                 visitDeclarationlist(ctx.declarationlist());
             } else if (ctx.TK_COMA() != null) {
@@ -437,7 +474,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 myWriter.write(",");
                 System.out.print(" " + ctx.ID().getText() + " ");
                 myWriter.write(" " + ctx.ID().getText() + " ");
-                variableTypeInput.put(ctx.ID().getText(),currentTypeInput);
+                variableTypeInput.put(ctx.ID().getText(), currentTypeInput);
                 visitDeclarationlist(ctx.declarationlist());
             }
         } catch (IOException e) {
@@ -461,24 +498,26 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitInstruction(MiLenguajeParser.InstructionContext ctx) {
         try {
             if (ctx.standardtype() != null && ctx.expression() != null) {
+                printTabs();
                 visitStandardtype(ctx.standardtype());
                 System.out.print(" " + ctx.ID(0).getText() + "=");
                 myWriter.write(" " + ctx.ID(0).getText() + "=");
-                variableTypeInput.put(ctx.ID(0).getText(),currentTypeInput);
+                variableTypeInput.put(ctx.ID(0).getText(), currentTypeInput);
                 visitExpression(ctx.expression());
                 visitDeclarationlist(ctx.declarationlist());
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.standardtype() != null) {
+                printTabs();
                 visitStandardtype(ctx.standardtype());
                 System.out.print(" " + ctx.ID(0).getText() + " ");
                 myWriter.write(" " + ctx.ID(0).getText() + " ");
-                variableTypeInput.put(ctx.ID(0).getText(),currentTypeInput);
+                variableTypeInput.put(ctx.ID(0).getText(), currentTypeInput);
                 visitDeclarationlist(ctx.declarationlist());
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.declarationlist() != null && ctx.expression() != null) {
-
+                printTabs();
                 System.out.print(ctx.ID(0).getText() + " ");
                 myWriter.write(ctx.ID(0).getText() + " ");
                 System.out.print(" " + ctx.ID(1).getText() + "=");
@@ -488,18 +527,20 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.declarationlist() != null) {
-
+                printTabs();
                 System.out.print(ctx.ID(0).getText() + " ");
                 myWriter.write(ctx.ID(0).getText() + " ");
                 System.out.print(" " + ctx.ID(1).getText() + "");
                 myWriter.write(" " + ctx.ID(1).getText() + "");
+                System.out.print("= new "+ ctx.ID(0).getText()+ " ()");
+                myWriter.write("= new "+ ctx.ID(0).getText()+ " ()");
                 visitDeclarationlist(ctx.declarationlist());
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.structurelist() != null && ctx.expression() != null) {
-
-                System.out.print(ctx.ID(0).getText() + " ");
-                myWriter.write(ctx.ID(0).getText() + " ");
+                printTabs();
+                System.out.print(ctx.ID(0).getText());
+                myWriter.write(ctx.ID(0).getText());
                 visitStructurelist(ctx.structurelist());
                 System.out.print("=");
                 myWriter.write("=");
@@ -507,23 +548,24 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.argumentlist() != null) {
-
+                printTabs();
                 System.out.print(ctx.ID(0).getText() + "(");
                 myWriter.write(ctx.ID(0).getText() + "(");
                 visitExpression(ctx.expression());
                 visitArgumentlist(ctx.argumentlist());
                 System.out.print(");\n");
                 myWriter.write(");\n");
-            } else if (ctx.expression() != null && ctx.TK_ASIG()!=null) {
-
+            } else if (ctx.expression() != null && ctx.TK_ASIG() != null) {
+                printTabs();
                 System.out.print(ctx.ID(0).getText() + "=");
                 myWriter.write(ctx.ID(0).getText() + "=");
                 visitExpression(ctx.expression());
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.structurelist() != null) {
-                System.out.print(ctx.ID(0).getText() + " ");
-                myWriter.write(ctx.ID(0).getText() + " ");
+                printTabs();
+                System.out.print(ctx.ID(0).getText());
+                myWriter.write(ctx.ID(0).getText());
                 visitStructurelist(ctx.structurelist());
                 System.out.print("=");
                 myWriter.write("=");
@@ -534,17 +576,18 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 System.out.print(";\n");
                 myWriter.write(";\n");
             } else if (ctx.LEER() != null) {
+                printTabs();
 
                 System.out.print(ctx.ID(0).getText() + " ");
                 myWriter.write(ctx.ID(0).getText() + " ");
                 System.out.print("=");
                 myWriter.write("=");
 
-                if(variableTypeInput.containsKey(ctx.ID(0).getText())){
+                if (variableTypeInput.containsKey(ctx.ID(0).getText())) {
 
                     System.out.print(variableTypeInput.get(ctx.ID(0).getText()));
                     myWriter.write(variableTypeInput.get(ctx.ID(0).getText()));
-                }else{
+                } else {
                     System.out.print("scanner.next()");
                     myWriter.write("scanner.next()");
                 }
@@ -561,16 +604,16 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 visitDowhile(ctx.dowhile());
             } else if (ctx.switchPSI() != null) {
                 visitSwitchPSI(ctx.switchPSI());
-            } else if(ctx.IMPRIMIR()!=null){
-
+            } else if (ctx.IMPRIMIR() != null) {
+                printTabs();
                 System.out.print("System.out.println(");
                 myWriter.write("System.out.println(");
                 visitExpression(ctx.expression());
                 visitExpressionlist(ctx.expressionlist());
                 System.out.print(");\n");
                 myWriter.write(");\n");
-            }else{
-
+            } else {
+                printTabs();
                 System.out.print(ctx.ID(0).getText() + "();\n");
                 myWriter.write(ctx.ID(0).getText() + "();\n");
             }
@@ -584,26 +627,37 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitConditional(MiLenguajeParser.ConditionalContext ctx) {
         try {
             if (ctx.SI_NO() != null) {
+                printTabs();
                 System.out.print("if(");
                 myWriter.write("if(");
                 visitExpression(ctx.expression());
                 System.out.print("){\n");
                 myWriter.write("){\n");
+                tabs++;
                 visitIfinstructionlist(ctx.ifinstructionlist(0));
-                System.out.print("\n} else {\n");
-                myWriter.write("\n}else{\n");
+                tabs--;
+                printTabs();
+                System.out.print("} else {\n");
+                myWriter.write("}else{\n");
+                tabs++;
                 visitIfinstructionlist(ctx.ifinstructionlist(1));
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
+                tabs--;
+                printTabs();
+                System.out.print("}\n");
+                myWriter.write("}\n");
             } else {
+                printTabs();
                 System.out.print("if(");
                 myWriter.write("if(");
                 visitExpression(ctx.expression());
                 System.out.print("){\n");
                 myWriter.write("){\n");
+                tabs++;
                 visitIfinstructionlist(ctx.ifinstructionlist(0));
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
+                tabs--;
+                printTabs();
+                System.out.print("}\n");
+                myWriter.write("}\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -614,15 +668,19 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     @Override
     public T visitWhilePSI(MiLenguajeParser.WhilePSIContext ctx) {
         try {
-
+            printTabs();
             System.out.print("while(");
             myWriter.write("while(");
             visitExpression(ctx.expression());
             System.out.print("){\n");
             myWriter.write("){\n");
+            tabs++;
+
             visitWhinstructionlist(ctx.whinstructionlist());
-            System.out.print("\n}\n");
-            myWriter.write("\n}\n");
+            tabs--;
+            printTabs();
+            System.out.print("}\n");
+            myWriter.write("}\n");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -634,6 +692,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitForPSI(MiLenguajeParser.ForPSIContext ctx) {
         try {
             if (ctx.standardtype() != null) {
+                printTabs();
                 System.out.print("for(");
                 myWriter.write("for(");
                 visitStandardtype(ctx.standardtype());
@@ -649,10 +708,14 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 visitExpression(ctx.expression(2));
                 System.out.print("){\n");
                 myWriter.write("){\n");
+                tabs++;
                 visitFrinstructionlist(ctx.frinstructionlist());
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
-            } else if(ctx.ID()==null){
+                tabs--;
+                printTabs();
+                System.out.print("}\n");
+                myWriter.write("}\n");
+            } else if (ctx.ID() == null) {
+                printTabs();
                 System.out.print("for(");
                 myWriter.write("for(");
                 visitExpression(ctx.expression(0));
@@ -664,10 +727,15 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 visitExpression(ctx.expression(2));
                 System.out.print("){\n");
                 myWriter.write("){\n");
+                tabs++;
                 visitFrinstructionlist(ctx.frinstructionlist());
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
+                tabs--;
+                printTabs();
+
+                System.out.print("}\n");
+                myWriter.write("}\n");
             } else {
+                printTabs();
                 System.out.print("for(");
                 myWriter.write("for(");
                 System.out.print(" " + ctx.ID().getText() + "=");
@@ -684,9 +752,12 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
                 visitExpression(ctx.expression(2));
                 System.out.print("){\n");
                 myWriter.write("){\n");
+                tabs++;
                 visitFrinstructionlist(ctx.frinstructionlist());
-                System.out.print("\n}\n");
-                myWriter.write("\n}\n");
+                tabs--;
+                printTabs();
+                System.out.print("}\n");
+                myWriter.write("}\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -697,12 +768,15 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     @Override
     public T visitDowhile(MiLenguajeParser.DowhileContext ctx) {
         try {
-
+            printTabs();
             System.out.print("do{\n");
             myWriter.write("do{\n");
+            tabs++;
             visitDwinstructionlist(ctx.dwinstructionlist());
-            System.out.print("\n} while (");
-            myWriter.write("\n} while (");
+            tabs--;
+            printTabs();
+            System.out.print("} while (");
+            myWriter.write("} while (");
             visitExpression(ctx.expression());
             System.out.print(");\n");
             myWriter.write(");\n");
@@ -716,14 +790,17 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     @Override
     public T visitSwitchPSI(MiLenguajeParser.SwitchPSIContext ctx) {
         try {
-
+            printTabs();
             System.out.print("switch(");
             myWriter.write("switch(");
             System.out.print(ctx.ID().getText() + "){\n");
             myWriter.write(ctx.ID().getText() + "){\n");
+            tabs++;
             visitCaselist(ctx.caselist());
-            System.out.print("\n}\n");
-            myWriter.write("\n}\n");
+            tabs--;
+            printTabs();
+            System.out.print("}\n");
+            myWriter.write("}\n");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -734,38 +811,54 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     @Override
     public T visitCaselist(MiLenguajeParser.CaselistContext ctx) {
         try {
-            if (ctx.CASO() != null&&ctx.ROMPER()!=null) {
+            if (ctx.CASO() != null && ctx.ROMPER() != null) {
+                printTabs();
                 System.out.print("case ");
                 myWriter.write("case ");
                 visitExpression(ctx.expression());
                 System.out.print(":\n ");
                 myWriter.write(":\n ");
+                tabs++;
                 visitSwinstructionlist(ctx.swinstructionlist());
+                printTabs();
                 System.out.print("break;\n");
                 myWriter.write("break;\n");
+                tabs--;
                 visitCaselist(ctx.caselist());
-            }else if(ctx.CASO() != null){
+            } else if (ctx.CASO() != null) {
+                printTabs();
                 System.out.print("case ");
                 myWriter.write("case ");
                 visitExpression(ctx.expression());
                 System.out.print(":\n ");
                 myWriter.write(":\n ");
+                tabs++;
                 visitSwinstructionlist(ctx.swinstructionlist());
+                tabs--;
                 visitCaselist(ctx.caselist());
-            }else if(ctx.DEFECTO()!=null &&ctx.ROMPER()!=null){
+
+            } else if (ctx.DEFECTO() != null && ctx.ROMPER() != null) {
+                printTabs();
                 System.out.print("default ");
                 myWriter.write("default ");
                 System.out.print(":\n ");
                 myWriter.write(":\n ");
+                tabs++;
                 visitSwinstructionlist(ctx.swinstructionlist());
+                tabs--;
+                printTabs();
+
                 System.out.print("break;\n");
                 myWriter.write("break;\n");
-            }else if(ctx.DEFECTO()!=null){
+            } else if (ctx.DEFECTO() != null) {
+                printTabs();
                 System.out.print("default ");
                 myWriter.write("default ");
                 System.out.print(":\n ");
                 myWriter.write(":\n ");
+                tabs++;
                 visitSwinstructionlist(ctx.swinstructionlist());
+                tabs--;
                 visitCaselist(ctx.caselist());
             }
         } catch (IOException e) {
@@ -794,8 +887,8 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
     public T visitStructurelist(MiLenguajeParser.StructurelistContext ctx) {
         try {
             if (ctx.ID() != null) {
-                System.out.print("+\"\"+");
-                myWriter.write("+\"\"+");
+                System.out.print(".");
+                myWriter.write(".");
                 System.out.print(ctx.ID().getText());
                 myWriter.write(ctx.ID().getText());
                 visitStructurelist(ctx.structurelist());
@@ -808,7 +901,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
 
     @Override
     public T visitStinstructionlist(MiLenguajeParser.StinstructionlistContext ctx) {
-        if(ctx.instruction()!=null){
+        if (ctx.instruction() != null) {
             visitInstruction(ctx.instruction());
             visitStinstructionlist(ctx.stinstructionlist());
         }
@@ -817,7 +910,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
 
     @Override
     public T visitFninstructionlist(MiLenguajeParser.FninstructionlistContext ctx) {
-        if(ctx.instruction()!=null){
+        if (ctx.instruction() != null) {
             visitInstruction(ctx.instruction());
             visitFninstructionlist(ctx.fninstructionlist());
         }
@@ -826,7 +919,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
 
     @Override
     public T visitIfinstructionlist(MiLenguajeParser.IfinstructionlistContext ctx) {
-        if(ctx.instruction()!=null){
+        if (ctx.instruction() != null) {
             visitInstruction(ctx.instruction());
             visitIfinstructionlist(ctx.ifinstructionlist());
         }
@@ -835,7 +928,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
 
     @Override
     public T visitWhinstructionlist(MiLenguajeParser.WhinstructionlistContext ctx) {
-        if(ctx.instruction()!=null){
+        if (ctx.instruction() != null) {
             visitInstruction(ctx.instruction());
             visitWhinstructionlist(ctx.whinstructionlist());
         }
@@ -844,7 +937,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
 
     @Override
     public T visitFrinstructionlist(MiLenguajeParser.FrinstructionlistContext ctx) {
-        if(ctx.instruction()!=null){
+        if (ctx.instruction() != null) {
             visitInstruction(ctx.instruction());
             visitFrinstructionlist(ctx.frinstructionlist());
         }
@@ -857,7 +950,8 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
             if (ctx.instruction() != null) {
                 visitInstruction(ctx.instruction());
                 visitDwinstructionlist(ctx.dwinstructionlist());
-            }else if(ctx.ROMPER()!=null){
+            } else if (ctx.ROMPER() != null) {
+                printTabs();
                 System.out.print("break;\n");
                 myWriter.write("break;\n");
             }
@@ -869,7 +963,7 @@ public class TranslatorVisitor<T> extends MiLenguajeBaseVisitor<T> {
 
     @Override
     public T visitSwinstructionlist(MiLenguajeParser.SwinstructionlistContext ctx) {
-        if(ctx.instruction()!=null){
+        if (ctx.instruction() != null) {
             visitInstruction(ctx.instruction());
             visitSwinstructionlist(ctx.swinstructionlist());
         }

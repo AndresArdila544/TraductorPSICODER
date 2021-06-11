@@ -1,37 +1,15 @@
-//Numeros Amigos
-//Funciones
-
 funcion_principal
-    entero m,amigo1,amigo2,suma_divisores_amigo1,suma_divisores_amigo2;
-    booleano f;
-    real r;
-    cadena ca;
-    caracter c;
-    imprimir("Digite el numero hasta donde desea conocer las parejas de numeros amigos ");
-    leer(m);
-    leer(f);
-    leer(r);
-    leer(ca);
-    leer(c);
-
-    para (amigo1=2; amigo1<m; 1) hacer
-       suma_divisores_amigo1 = amigo(amigo1);
-       para(amigo2 = amigo1+1; amigo2<=m; 1) hacer
-           suma_divisores_amigo2 = amigo(amigo2);
-           si((suma_divisores_amigo1 == amigo2) && (suma_divisores_amigo2 == amigo1)) entonces
-              imprimir(amigo1,"  ",amigo2," son amigos");
-           fin_si
-       fin_para
-    fin_para
+    entero n;
+    imprimir("Ingrese n");
+    leer(n);
+    entero lo = 1, hi = n;
+    mientras (lo < hi) hacer
+        entero mi = (lo+hi+1)/2;
+        si( mi*mi <= n ) entonces
+            lo = mi;
+        si_no
+            hi = mi-1;
+        fin_si
+    fin_mientras
+    imprimir("La raiz cuadrada de ", n, " es ", lo);
 fin_principal
-
-funcion entero amigo(entero numero) hacer
-  entero divisor, suma_divisores = 0;
-
-  para (divisor=1; divisor<numero; 1) hacer
-      si (numero % divisor == 0) entonces
-         suma_divisores = suma_divisores + divisor;
-      fin_si
-  fin_para
-  retornar suma_divisores;
-fin_funcion

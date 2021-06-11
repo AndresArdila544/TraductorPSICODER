@@ -220,7 +220,7 @@ FALSO: 'falso';
 VERDADERO: 'verdadero';
 
 ID : [a-zA-Z][a-zA-Z0-9_]* ;
-TK_ENTERO : (|'-')[0-9]+ ;
+TK_ENTERO : [0-9]+ ;
 TK_REAL : (|'-')[0-9]+ TK_PUNTO [0-9]+;
 TK_CADENA              : '"' .*? '"';
 TK_CARACTER               : '\''[a-zA-Z]'\'';
